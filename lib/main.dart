@@ -44,6 +44,7 @@ class MyApp extends StatelessWidget {
                     ),
                   ),
                   PersonalInformationForm(),
+                  // QuizCard(questionId: 1, question: 'Far-right protestors tried to storm the Parliament building in which country?', choices:['Australia','Britain','France','Germany']),
                 ],
               ),
             ),
@@ -217,6 +218,58 @@ class PersonalInformationFormState extends State<PersonalInformationForm> {
               )
           )
         ]
+      ),
+    );
+  }
+}
+
+class QuizCard extends StatefulWidget {
+  final int questionId;
+  final String question;
+  final List<String> choices;
+  QuizCard({Key key, this.questionId, this.question, this.choices}) : super(key: key);
+  @override
+  QuizCardState createState() {
+    return QuizCardState();
+  }
+}
+
+class QuizCardState extends State<QuizCard> {
+  String _selectedAnswer = '';
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.all(10.0),
+      // color: Colors.red[600],
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Text(
+                widget.question,
+                style: TextStyle(
+                  fontSize: 15,
+                  fontFamily: 'Open Sans',
+                ),
+            ),
+          ),
+          ...widget.choices.map((choice) => ListTile(
+          title: Text(
+              choice,
+              style: TextStyle(
+              fontSize: 15,
+              fontFamily: 'Open Sans',
+              ),
+          ),
+          leading: Radio(
+            value: '${choice}',
+            groupValue: _selectedAnswer,
+            onChanged: (value) {
+              setState(() {
+                _selectedAnswer = value;
+              });
+            },
+          ),
+        )).toList()]
       ),
     );
   }
