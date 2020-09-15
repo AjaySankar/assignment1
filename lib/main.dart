@@ -25,26 +25,8 @@ class MyApp extends StatelessWidget {
             child: SingleChildScrollView(
               child: Column(
                 children: <Widget>[
-                  Container(
-                    // color: Colors.red,
-                    padding: const EdgeInsets.all(10.0),
-                    child: Row(
-                      children: <Widget>[
-                        Expanded(
-                          child: Text(
-                            "About you",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 30,
-                              fontFamily: 'Open Sans',
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  PersonalInformationForm(),
-                  // QuizCard(questionId: 1, question: 'Far-right protestors tried to storm the Parliament building in which country?', choices:['Australia','Britain','France','Germany']),
+                  // PersonalInformationForm(),
+                  QuizCard(questionId: 1, question: 'Far-right protestors tried to storm the Parliament building in which country?', choices:['Australia','Britain','France','Germany']),
                 ],
               ),
             ),
@@ -76,6 +58,24 @@ class PersonalInformationFormState extends State<PersonalInformationForm> {
       child: Column (
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
+          Container(
+            // color: Colors.red,
+            padding: const EdgeInsets.all(10.0),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: Text(
+                    "About you",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 30,
+                      fontFamily: 'Open Sans',
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
           Row(
             children: <Widget>[
               Expanded(
@@ -247,7 +247,7 @@ class QuizCardState extends State<QuizCard> {
             child: Text(
                 widget.question,
                 style: TextStyle(
-                  fontSize: 15,
+                  fontSize: 20,
                   fontFamily: 'Open Sans',
                 ),
             ),
@@ -256,7 +256,7 @@ class QuizCardState extends State<QuizCard> {
           title: Text(
               choice,
               style: TextStyle(
-              fontSize: 15,
+              fontSize: 20,
               fontFamily: 'Open Sans',
               ),
           ),
