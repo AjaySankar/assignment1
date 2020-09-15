@@ -205,7 +205,6 @@ class PersonalInformationFormState extends State<PersonalInformationForm> {
                   onPressed: () {
                     // Validate returns true if the form is valid, or false
                     // otherwise.
-                    print("Hello world");
                     if (_formKey.currentState.validate()) {
                       // If the form is valid, display a Snackbar.
                       Scaffold.of(context)
@@ -240,36 +239,53 @@ class QuizCardState extends State<QuizCard> {
     return Container(
       margin: const EdgeInsets.all(10.0),
       // color: Colors.red[600],
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Text(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            Text(
                 widget.question,
                 style: TextStyle(
                   fontSize: 20,
                   fontFamily: 'Open Sans',
                 ),
             ),
-          ),
-          ...widget.choices.map((choice) => ListTile(
-          title: Text(
-              choice,
-              style: TextStyle(
-              fontSize: 20,
-              fontFamily: 'Open Sans',
-              ),
-          ),
-          leading: Radio(
-            value: '${choice}',
-            groupValue: _selectedAnswer,
-            onChanged: (value) {
-              setState(() {
-                _selectedAnswer = value;
-              });
-            },
-          ),
-        )).toList()]
+            ...widget.choices.map((choice) => ListTile(
+            title: Text(
+                choice,
+                style: TextStyle(
+                fontSize: 20,
+                fontFamily: 'Open Sans',
+                ),
+            ),
+            leading: Radio(
+              value: '${choice}',
+              groupValue: _selectedAnswer,
+              onChanged: (value) {
+                setState(() {
+                  _selectedAnswer = value;
+                });
+              },
+            ),)).toList(),
+            Row (
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                RaisedButton(
+                  onPressed: () {
+                    print("Clicked Prev");
+                  },
+                  child: Text('Prev')
+                ),
+                RaisedButton(
+                  onPressed: () {
+                    print("Clicked Next");
+                  },
+                  child: Text('Next')
+                )
+              ],
+            )
+          ],
+        ),
       ),
     );
   }
