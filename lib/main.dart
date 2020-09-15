@@ -63,12 +63,17 @@ class PersonalInformationForm extends StatefulWidget {
 }
 
 class PersonalInformationFormState extends State<PersonalInformationForm> {
+  String _firstName = '';
+  String _familyName = '';
+  String _nickName = '';
+  int _age = 1;
   final _formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
     return Form(
       key: _formKey,
       child: Column (
+        mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           Row(
             children: <Widget>[
@@ -76,9 +81,14 @@ class PersonalInformationFormState extends State<PersonalInformationForm> {
                   child: TextFormField (
                     validator: (value) {
                       if (value.isEmpty) {
-                        return 'Please enter some text';
+                        return 'Please enter first name';
                       }
                       return null;
+                    },
+                    onSaved: (value) {
+                      setState(() {
+                        _firstName = value;
+                      });
                     },
                     decoration: InputDecoration(
                       labelText: 'First Name',
@@ -101,9 +111,14 @@ class PersonalInformationFormState extends State<PersonalInformationForm> {
                   child: TextFormField (
                     validator: (value) {
                       if (value.isEmpty) {
-                        return 'Please enter some text';
+                        return 'Please enter last name';
                       }
                       return null;
+                    },
+                    onSaved: (value) {
+                      setState(() {
+                        _familyName = value;
+                      });
                     },
                     decoration: InputDecoration(
                       labelText: 'Family Name',
@@ -126,9 +141,14 @@ class PersonalInformationFormState extends State<PersonalInformationForm> {
                   child: TextFormField (
                     validator: (value) {
                       if (value.isEmpty) {
-                        return 'Please enter some text';
+                        return 'Please enter your nickname';
                       }
                       return null;
+                    },
+                    onSaved: (value) {
+                      setState(() {
+                        _nickName = value;
+                      });
                     },
                     decoration: InputDecoration(
                       labelText: 'Nick Name',
@@ -152,9 +172,17 @@ class PersonalInformationFormState extends State<PersonalInformationForm> {
                     keyboardType: TextInputType.number,
                     validator: (value) {
                       if (value.isEmpty) {
-                        return 'Please enter some number';
+                        return 'Please enter your age';
+                      }
+                      if(int.tryParse(value) <= 0) {
+                        return 'Invalid age';
                       }
                       return null;
+                    },
+                    onSaved: (value) {
+                      setState(() {
+                        _age = int.tryParse(value);
+                      });
                     },
                     decoration: InputDecoration(
                       labelText: 'Age',
@@ -176,10 +204,13 @@ class PersonalInformationFormState extends State<PersonalInformationForm> {
                   onPressed: () {
                     // Validate returns true if the form is valid, or false
                     // otherwise.
+                    print("Hello world");
                     if (_formKey.currentState.validate()) {
                       // If the form is valid, display a Snackbar.
                       Scaffold.of(context)
                           .showSnackBar(SnackBar(content: Text('Processing Data')));
+                      _formKey.currentState.save();
+                      print('${_firstName}, ${_familyName}, ${_nickName}, ${_age}');
                     }
                   },
                   child: Text('Done')
