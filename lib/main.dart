@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
               child: Column(
                 children: <Widget>[
                   // PersonalInformationForm(),
-                  QuizCard(questionId: 1, question: 'Far-right protestors tried to storm the Parliament building in which country?', choices:['Australia','Britain','France','Germany']),
+                  QuizCard(),
                 ],
               ),
             ),
@@ -223,19 +223,62 @@ class PersonalInformationFormState extends State<PersonalInformationForm> {
 }
 
 class QuizCard extends StatefulWidget {
-  final int questionId;
-  final String question;
-  final List<String> choices;
-  QuizCard({Key key, this.questionId, this.question, this.choices}) : super(key: key);
+  QuizCard({Key key}) : super(key: key);
   @override
   QuizCardState createState() {
     return QuizCardState();
   }
 }
 
+class Question {
+  int _questionId;
+  String _question;
+  List<String> _choices;
+  String _correctAnswer;
+  String _myGuess;
+  Question(this._questionId, this._question, this._choices, this._correctAnswer);
+  int getQuestionId() {
+    return _questionId;
+  }
+  String getQuestion() {
+    return _question;
+  }
+  List<String> getChoices() {
+    return _choices;
+  }
+  bool isMyGuessCorrect() {
+    return this._myGuess == this._correctAnswer;
+  }
+  void setMyGuess(String guess) {
+    this._myGuess = guess;
+  }
+}
+
+class QuizManager {
+  static final QuizManager _quizManager = QuizManager._internal();
+  final List<Question> questions = [Question(0, 'ABCD', ['E','F','G','H'], 'E'), Question(1, 'WXYZ', ['P','Q','R','S'], 'Q')];
+  factory QuizManager() {
+    return _quizManager;
+  }
+  QuizManager._internal() {
+    // Read the file to fill in questions
+  }
+  int getNumberOfQuestion() {
+    return this.questions.length;
+  }
+  void updateQuestionGuess(int questionId, String myGuess) {
+    this.questions[questionId].setMyGuess(myGuess);
+  }
+  Question getQuestion(int questionId) {
+    return this.questions[questionId];
+  }
+}
+
 class QuizCardState extends State<QuizCard> {
+  int _questionId = 0;
   String _selectedAnswer = '';
   Widget build(BuildContext context) {
+    Question question = QuizManager().getQuestion(_questionId);
     return Container(
       margin: const EdgeInsets.all(10.0),
       // color: Colors.red[600],
@@ -244,13 +287,13 @@ class QuizCardState extends State<QuizCard> {
         child: Column(
           children: [
             Text(
-                widget.question,
+                question.getQuestion(),
                 style: TextStyle(
                   fontSize: 20,
                   fontFamily: 'Open Sans',
                 ),
             ),
-            ...widget.choices.map((choice) => ListTile(
+            ...question.getChoices().map((choice) => ListTile(
             title: Text(
                 choice,
                 style: TextStyle(
@@ -273,12 +316,19 @@ class QuizCardState extends State<QuizCard> {
                 RaisedButton(
                   onPressed: () {
                     print("Clicked Prev");
+                    setState(() {
+                      _questionId = _questionId - 1;
+                    });
                   },
                   child: Text('Prev')
                 ),
                 RaisedButton(
                   onPressed: () {
                     print("Clicked Next");
+                    print(_questionId);
+                    setState(() {
+                      _questionId = _questionId + 1;
+                    });
                   },
                   child: Text('Next')
                 )
