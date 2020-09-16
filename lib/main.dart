@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
 
 void main() {
   runApp(MyApp());
@@ -51,6 +53,8 @@ class PersonalInformationFormState extends State<PersonalInformationForm> {
   int _age = 1;
   int _score = -1;
   final _formKey = GlobalKey<FormState>();
+  final String _userPreferencesFile = 'UserPreferences.txt';
+
   @override
   Widget build(BuildContext context) {
     return Form(
@@ -206,6 +210,11 @@ class PersonalInformationFormState extends State<PersonalInformationForm> {
                     // otherwise.
                     if (_formKey.currentState.validate()) {
                       _formKey.currentState.save();
+                      Future<File> fh = FileHandler().writeFile(_userPreferencesFile, '${_firstName},${_familyName},${_nickName},${_age}');
+                      fh.then((result) {
+                        Scaffold.of(context)
+                            .showSnackBar(SnackBar(content: Text('Updated your details as - ${_firstName},${_familyName},${_nickName},${_age}')));
+                      });
                       print('${_firstName}, ${_familyName}, ${_nickName}, ${_age}');
                       final score = await Navigator.push(
                         context,
@@ -382,5 +391,33 @@ class QuizCardState extends State<QuizCard> {
           ),
         ),
     );
+  }
+}
+
+class FileHandler {
+  Future<String> localPath() async {
+    final directory = await getApplicationDocumentsDirectory();
+    return directory.path;
+  }
+
+  Future<File> localFile(String fileName) async {
+    final path = await localPath();
+    return File('${path}/${fileName}');
+  }
+
+  Future<String> readFile(String fileName) async {
+    try {
+      final file = await localFile(fileName);
+      String contents = await file.readAsString();
+      return contents;
+    }
+    catch(e) {
+      return '';
+    }
+  }
+
+  Future<File> writeFile(String fileName, String contents) async {
+    final file = await localFile(fileName);
+    return file.writeAsString(contents);
   }
 }
