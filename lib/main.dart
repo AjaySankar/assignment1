@@ -25,8 +25,8 @@ class MyApp extends StatelessWidget {
             child: SingleChildScrollView(
               child: Column(
                 children: <Widget>[
-                  // PersonalInformationForm(),
-                  QuizCard(),
+                  PersonalInformationForm(),
+                  // QuizCard(),
                 ],
               ),
             ),
@@ -211,6 +211,10 @@ class PersonalInformationFormState extends State<PersonalInformationForm> {
                           .showSnackBar(SnackBar(content: Text('Processing Data')));
                       _formKey.currentState.save();
                       print('${_firstName}, ${_familyName}, ${_nickName}, ${_age}');
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => QuizCard()),
+                      );
                     }
                   },
                   child: Text('Done')
@@ -296,64 +300,73 @@ class QuizCardState extends State<QuizCard> {
   bool _didUserAnswer = false;
   Widget build(BuildContext context) {
     Question question = QuizManager().getQuestion(_questionId);
-    return Container(
-      margin: const EdgeInsets.all(10.0),
-      // color: Colors.red[600],
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            Text(
-                question.getQuestion(),
-                style: TextStyle(
-                  fontSize: 20,
-                  fontFamily: 'Open Sans',
-                ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Quiz App"),
+      ),
+      body: Center(
+        child: SingleChildScrollView(
+          child: Container(
+            margin: const EdgeInsets.all(10.0),
+            // color: Colors.red[600],
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  Text(
+                      question.getQuestion(),
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontFamily: 'Open Sans',
+                      ),
+                  ),
+                  ...question.getChoices().map((choice) => ListTile(
+                  title: Text(
+                      choice,
+                      style: TextStyle(
+                      fontSize: 20,
+                      fontFamily: 'Open Sans',
+                      ),
+                  ),
+                  leading: Radio(
+                    value: '${choice}',
+                    groupValue: QuizManager().getMyGuess(_questionId),
+                    onChanged: (value) {
+                      setState(() {
+                        QuizManager().updateQuestionGuess(_questionId, value);
+                        _didUserAnswer = QuizManager().getMyGuess(_questionId).length > 0;
+                      });
+                    },
+                  ),)).toList(),
+                  Row (
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      RaisedButton(
+                        onPressed: _questionId >= 1 ? () {
+                          setState(() {
+                            _didUserAnswer = QuizManager().getMyGuess(_questionId-1).length > 0;
+                            _questionId = _questionId - 1;
+                          });
+                        } : null,
+                        child: Text('Prev')
+                      ),
+                      RaisedButton(
+                        onPressed: _questionId == QuizManager().getNumberOfQuestions()-1 && _didUserAnswer ? () {
+                          print('Your score - ${QuizManager().getScore()}');
+                        } : () {
+                          setState(() {
+                            _didUserAnswer = QuizManager().getMyGuess(_questionId+1).length > 0;
+                            _questionId = _questionId + 1;
+                          });
+                        },
+                        child: Text(_questionId == QuizManager().getNumberOfQuestions()-1 && _didUserAnswer ? 'End' : 'Next')
+                      )
+                    ],
+                  )
+                ],
+              ),
             ),
-            ...question.getChoices().map((choice) => ListTile(
-            title: Text(
-                choice,
-                style: TextStyle(
-                fontSize: 20,
-                fontFamily: 'Open Sans',
-                ),
-            ),
-            leading: Radio(
-              value: '${choice}',
-              groupValue: QuizManager().getMyGuess(_questionId),
-              onChanged: (value) {
-                setState(() {
-                  QuizManager().updateQuestionGuess(_questionId, value);
-                  _didUserAnswer = QuizManager().getMyGuess(_questionId).length > 0;
-                });
-              },
-            ),)).toList(),
-            Row (
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                RaisedButton(
-                  onPressed: _questionId >= 1 ? () {
-                    setState(() {
-                      _didUserAnswer = QuizManager().getMyGuess(_questionId-1).length > 0;
-                      _questionId = _questionId - 1;
-                    });
-                  } : null,
-                  child: Text('Prev')
-                ),
-                RaisedButton(
-                  onPressed: _questionId == QuizManager().getNumberOfQuestions()-1 && _didUserAnswer ? () {
-                    print('Your score - ${QuizManager().getScore()}');
-                  } : () {
-                    setState(() {
-                      _didUserAnswer = QuizManager().getMyGuess(_questionId+1).length > 0;
-                      _questionId = _questionId + 1;
-                    });
-                  },
-                  child: Text(_questionId == QuizManager().getNumberOfQuestions()-1 && _didUserAnswer ? 'End' : 'Next')
-                )
-              ],
-            )
-          ],
+          ),
         ),
       ),
     );
