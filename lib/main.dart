@@ -58,23 +58,22 @@ class PersonalInformationFormState extends State<PersonalInformationForm> {
       child: Column (
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Container(
-            // color: Colors.red,
+          Padding(
             padding: const EdgeInsets.all(10.0),
             child: Row(
-              children: <Widget>[
-                Expanded(
-                  child: Text(
-                    "About you",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 30,
-                      fontFamily: 'Open Sans',
+                children: <Widget>[
+                  Expanded(
+                    child: Text(
+                      "About you",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 30,
+                        fontFamily: 'Open Sans',
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
           ),
           Row(
             children: <Widget>[
