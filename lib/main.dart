@@ -26,7 +26,6 @@ class MyApp extends StatelessWidget {
               child: Column(
                 children: <Widget>[
                   PersonalInformationForm(),
-                  // QuizCard(),
                 ],
               ),
             ),
@@ -350,9 +349,11 @@ class QuizCardState extends State<QuizCard> {
                         child: Text('Prev')
                       ),
                       RaisedButton(
-                        onPressed: _questionId == QuizManager().getNumberOfQuestions()-1 && _didUserAnswer ? () {
-                          print('Your score - ${QuizManager().getScore()}');
-                        } : () {
+                        onPressed: _questionId == QuizManager().getNumberOfQuestions()-1 ? ( // If this is the last question
+                            _didUserAnswer ? () {  // If User has answered the last question, then on click show his score.
+                              print('Your score - ${QuizManager().getScore()}');
+                            } : null // If user has not answered the last question yet then disable 'Next' button.
+                        ) : () { // If this is not the last question, then go to the next question.
                           setState(() {
                             _didUserAnswer = QuizManager().getMyGuess(_questionId+1).length > 0;
                             _questionId = _questionId + 1;
