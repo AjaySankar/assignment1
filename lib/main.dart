@@ -49,6 +49,7 @@ class PersonalInformationFormState extends State<PersonalInformationForm> {
   String _familyName = '';
   String _nickName = '';
   int _age = 1;
+  int _score = -1;
   final _formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
@@ -210,12 +211,26 @@ class PersonalInformationFormState extends State<PersonalInformationForm> {
                         context,
                         MaterialPageRoute(builder: (context) => QuizCard()),
                       );
+                      setState(() {
+                        _score = score;
+                      });
                       print('Your score - ${score}');
                     }
                   },
                   child: Text('Done')
               )
-          )
+          ),
+          _score >= 0 ? Container(
+            margin: const EdgeInsets.all(10.0),
+            child: Text(
+              'Your quiz score is ${_score}',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 30,
+                fontFamily: 'Open Sans',
+              ),
+            ),
+          ) : Container(),
         ]
       ),
     );
