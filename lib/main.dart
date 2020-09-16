@@ -200,19 +200,17 @@ class PersonalInformationFormState extends State<PersonalInformationForm> {
           ),
           Container(
               child: RaisedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     // Validate returns true if the form is valid, or false
                     // otherwise.
                     if (_formKey.currentState.validate()) {
-                      // If the form is valid, display a Snackbar.
-                      Scaffold.of(context)
-                          .showSnackBar(SnackBar(content: Text('Processing Data')));
                       _formKey.currentState.save();
                       print('${_firstName}, ${_familyName}, ${_nickName}, ${_age}');
-                      Navigator.push(
+                      final score = await Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => QuizCard()),
                       );
+                      print('Your score - ${score}');
                     }
                   },
                   child: Text('Done')
@@ -351,7 +349,7 @@ class QuizCardState extends State<QuizCard> {
                       RaisedButton(
                         onPressed: _questionId == QuizManager().getNumberOfQuestions()-1 ? ( // If this is the last question
                             _didUserAnswer ? () {  // If User has answered the last question, then on click show his score.
-                              print('Your score - ${QuizManager().getScore()}');
+                              Navigator.pop(context, QuizManager().getScore());
                             } : null // If user has not answered the last question yet then disable 'Next' button.
                         ) : () { // If this is not the last question, then go to the next question.
                           setState(() {
