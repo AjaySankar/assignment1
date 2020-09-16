@@ -231,11 +231,11 @@ class QuizCard extends StatefulWidget {
 }
 
 class Question {
-  int _questionId;
-  String _question;
-  List<String> _choices;
-  String _correctAnswer;
-  String _myGuess;
+  int _questionId = 0;
+  String _question = '';
+  List<String> _choices = [];
+  String _correctAnswer = '';
+  String _myGuess = '';
   Question(this._questionId, this._question, this._choices, this._correctAnswer);
   int getQuestionId() {
     return _questionId;
@@ -252,18 +252,26 @@ class Question {
   void setMyGuess(String guess) {
     this._myGuess = guess;
   }
+  String getMyGuess() {
+    return _myGuess;
+  }
 }
 
 class QuizManager {
   static final QuizManager _quizManager = QuizManager._internal();
-  final List<Question> questions = [Question(0, 'ABCD', ['E','F','G','H'], 'E'), Question(1, 'WXYZ', ['P','Q','R','S'], 'Q')];
+  final List<Question> questions = [
+    Question(0, 'Far-right protestors tried to storm the Parliament building in which country?', ['Australia','Britain','France','Germany'], 'Germany'),
+    Question(1, 'Why did Shinzo Abe, prime minister of Japan, resign from office?', ['An extramarital affair','Fraud','Illness','Protests'], 'Illness'),
+    Question(2, 'What did two commercial jet pilots reported seeing in the busy airspace near Los Angeles International Airport?', ['An attack drone','A man with a jetpack','A girl attached to a kite','A U.F.O'], 'A man with a jetpack'),
+    Question(3, 'After more than seven decades of absence, jaguars are being reintroduced into the wetlands of which country?', ['Argentina','Belize','Colombia','Mexico'], 'Argentina'),
+  ];
   factory QuizManager() {
     return _quizManager;
   }
   QuizManager._internal() {
     // Read the file to fill in questions
   }
-  int getNumberOfQuestion() {
+  int getNumberOfQuestions() {
     return this.questions.length;
   }
   void updateQuestionGuess(int questionId, String myGuess) {
@@ -272,11 +280,17 @@ class QuizManager {
   Question getQuestion(int questionId) {
     return this.questions[questionId];
   }
+  bool isMyGuessCorrect(int questionId) {
+    return this.questions[questionId].isMyGuessCorrect();
+  }
+  String getMyGuess(int questionId) {
+    return this.questions[questionId].getMyGuess();
+  }
 }
 
 class QuizCardState extends State<QuizCard> {
   int _questionId = 0;
-  String _selectedAnswer = '';
+  bool _didUserAnswer = false;
   Widget build(BuildContext context) {
     Question question = QuizManager().getQuestion(_questionId);
     return Container(
@@ -303,10 +317,12 @@ class QuizCardState extends State<QuizCard> {
             ),
             leading: Radio(
               value: '${choice}',
-              groupValue: _selectedAnswer,
+              groupValue: QuizManager().getMyGuess(_questionId),
               onChanged: (value) {
                 setState(() {
-                  _selectedAnswer = value;
+                  QuizManager().updateQuestionGuess(_questionId, value);
+                  _didUserAnswer = QuizManager().getMyGuess(_questionId).length > 0;
+                  print(QuizManager().isMyGuessCorrect(_questionId));
                 });
               },
             ),)).toList(),
@@ -314,23 +330,24 @@ class QuizCardState extends State<QuizCard> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 RaisedButton(
-                  onPressed: () {
-                    print("Clicked Prev");
+                  onPressed: _questionId >= 1 ? () {
                     setState(() {
+                      _didUserAnswer = QuizManager().getMyGuess(_questionId-1).length > 0;
                       _questionId = _questionId - 1;
                     });
-                  },
+                  } : null,
                   child: Text('Prev')
                 ),
                 RaisedButton(
-                  onPressed: () {
-                    print("Clicked Next");
-                    print(_questionId);
+                  onPressed: _questionId == QuizManager().getNumberOfQuestions()-1 && _didUserAnswer ? () {
+                    
+                  } : () {
                     setState(() {
+                      _didUserAnswer = QuizManager().getMyGuess(_questionId+1).length > 0;
                       _questionId = _questionId + 1;
                     });
                   },
-                  child: Text('Next')
+                  child: Text(_questionId == QuizManager().getNumberOfQuestions()-1 && _didUserAnswer ? 'End' : 'Next')
                 )
               ],
             )
