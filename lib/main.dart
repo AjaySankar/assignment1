@@ -286,6 +286,9 @@ class QuizManager {
   String getMyGuess(int questionId) {
     return this.questions[questionId].getMyGuess();
   }
+  int getScore() {
+    return this.questions.where((question) => question.isMyGuessCorrect()).toList().length;
+  }
 }
 
 class QuizCardState extends State<QuizCard> {
@@ -322,7 +325,6 @@ class QuizCardState extends State<QuizCard> {
                 setState(() {
                   QuizManager().updateQuestionGuess(_questionId, value);
                   _didUserAnswer = QuizManager().getMyGuess(_questionId).length > 0;
-                  print(QuizManager().isMyGuessCorrect(_questionId));
                 });
               },
             ),)).toList(),
@@ -340,7 +342,7 @@ class QuizCardState extends State<QuizCard> {
                 ),
                 RaisedButton(
                   onPressed: _questionId == QuizManager().getNumberOfQuestions()-1 && _didUserAnswer ? () {
-                    
+                    print('Your score - ${QuizManager().getScore()}');
                   } : () {
                     setState(() {
                       _didUserAnswer = QuizManager().getMyGuess(_questionId+1).length > 0;
