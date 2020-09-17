@@ -412,29 +412,23 @@ class QuizCardState extends State<QuizCard> {
                       },
                     ),)).toList(),
                     Row (
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        RaisedButton(
-                          onPressed: _questionId >= 1 ? () {
-                            setState(() {
-                              _didUserAnswer = QuizManager().getMyGuess(_questionId-1).length > 0;
-                              _questionId = _questionId - 1;
-                            });
-                          } : null,
-                          child: Text('Prev')
-                        ),
-                        RaisedButton(
-                          onPressed: _questionId == QuizManager().getNumberOfQuestions()-1 ? ( // If this is the last question
-                              _didUserAnswer ? () {  // If User has answered the last question, then on click show his score.
-                                Navigator.pop(context, QuizManager().getScore());
-                              } : null // If user has not answered the last question yet then disable 'Next' button.
-                          ) : () { // If this is not the last question, then go to the next question.
-                            setState(() {
-                              _didUserAnswer = QuizManager().getMyGuess(_questionId+1).length > 0;
-                              _questionId = _questionId + 1;
-                            });
-                          },
-                          child: Text(_questionId == QuizManager().getNumberOfQuestions()-1 && _didUserAnswer ? 'End' : 'Next')
+                        Opacity(
+                          opacity: _didUserAnswer ? 1.0 : 0.0,
+                          child: RaisedButton(
+                            onPressed: _questionId == QuizManager().getNumberOfQuestions()-1 ? ( // If this is the last question
+                                _didUserAnswer ? () {  // If User has answered the last question, then on click show his score.
+                                  Navigator.pop(context, QuizManager().getScore());
+                                } : null // If user has not answered the last question yet then disable 'Next' button.
+                            ) : () { // If this is not the last question, then go to the next question.
+                              setState(() {
+                                _didUserAnswer = QuizManager().getMyGuess(_questionId+1).length > 0;
+                                _questionId = _questionId + 1;
+                              });
+                            },
+                            child: Text(_questionId == QuizManager().getNumberOfQuestions()-1 && _didUserAnswer ? 'End' : 'Next')
+                          ),
                         )
                       ],
                     )
