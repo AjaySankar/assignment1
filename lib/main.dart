@@ -240,6 +240,26 @@ class PersonalInformationFormState extends State<PersonalInformationForm> {
           Container(
             height: 15,
           ),
+          _score >= 0 ?
+          Container(
+            child: RaisedButton(
+              onPressed: () async {
+                final prefs = await SharedPreferences.getInstance();
+                prefs.setString('First Name', _firstName);
+                prefs.setString('Family Name', _familyName);
+                prefs.setString('Nick Name', _nickName);
+                prefs.setString('Age', _age);
+                FileHandler().writeFile(_scoreFile, '${_score}').then(
+                        (value) => Scaffold.of(context).showSnackBar(
+                            SnackBar(
+                                content: Text('Saved your details!')
+                            )
+                        )
+                );
+              },
+              child: Text('Save')
+            )
+          ) :
           Container(
               child: RaisedButton(
                   onPressed: () async {
@@ -247,26 +267,21 @@ class PersonalInformationFormState extends State<PersonalInformationForm> {
                     // otherwise.
                     if (_formKey.currentState.validate()) {
                       _formKey.currentState.save();
-                      final prefs = await SharedPreferences.getInstance();
-                      prefs.setString('First Name', _firstName);
-                      prefs.setString('Family Name', _familyName);
-                      prefs.setString('Nick Name', _nickName);
-                      prefs.setString('Age', _age);
                       final score = await Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => QuizCard()),
                       );
-                      FileHandler().writeFile(_scoreFile, '$score');
                       setState(() {
                         _score = score;
                       });
                       print('Your score - ${score}');
                     }
                   },
-                  child: Text('Done')
+                  child: Text('Start Quiz')
               )
           ),
-          _score >= 0 ? Container(
+          _score >= 0 ?
+          Container(
             margin: const EdgeInsets.all(10.0),
             child: Text(
               'Your quiz score is ${_score}',
