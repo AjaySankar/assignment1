@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
 
 void main() {
@@ -50,29 +51,28 @@ class PersonalInformationFormState extends State<PersonalInformationForm> {
   String _firstName;
   String _familyName;
   String _nickName;
-  int _age;
+  String _age;
   int _score = -1;
   final _formKey = GlobalKey<FormState>();
-  final String _userPreferencesFile = 'UserPreferences.txt';
   TextEditingController firstNameController;
   TextEditingController lastNameController;
   TextEditingController nickNameController;
   TextEditingController ageController;
 
+  Future<Null> getSharedPrefs() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      firstNameController = TextEditingController(text: prefs.getString('First Name') ?? '');
+      lastNameController = TextEditingController(text: prefs.getString('Family Name') ?? '');
+      nickNameController = TextEditingController(text: prefs.getString('Nick Name') ?? '');
+      ageController = TextEditingController(text: prefs.getString('Age') ?? '');
+    });
+  }
+
   @override
   void initState() {
     super.initState();
-    FileHandler().readFile(_userPreferencesFile).then((String value) {
-      print("Read User preferences - ${value}");
-      if(value.length == 0) {
-        value = ',,,';
-      }
-      final List<String> userInfo = value.split(',');
-      firstNameController = TextEditingController(text: userInfo[0]);
-      lastNameController = TextEditingController(text: userInfo[1]);
-      nickNameController = TextEditingController(text: userInfo[2]);
-      ageController = TextEditingController(text: userInfo[3]);
-    });
+    getSharedPrefs();
   }
 
   @override
@@ -221,7 +221,7 @@ class PersonalInformationFormState extends State<PersonalInformationForm> {
                     },
                     onSaved: (value) {
                       setState(() {
-                        _age = int.tryParse(ageController.text);
+                        _age = ageController.text;
                       });
                     },
                     decoration: InputDecoration(
@@ -246,11 +246,11 @@ class PersonalInformationFormState extends State<PersonalInformationForm> {
                     // otherwise.
                     if (_formKey.currentState.validate()) {
                       _formKey.currentState.save();
-                      Future<File> fh = FileHandler().writeFile(_userPreferencesFile, '${_firstName},${_familyName},${_nickName},${_age}');
-                      fh.then((result) {
-                        Scaffold.of(context)
-                            .showSnackBar(SnackBar(content: Text('Updated your details as - ${_firstName},${_familyName},${_nickName},${_age}')));
-                      });
+                      final prefs = await SharedPreferences.getInstance();
+                      prefs.setString('First Name', _firstName);
+                      prefs.setString('Family Name', _familyName);
+                      prefs.setString('Nick Name', _nickName);
+                      prefs.setString('Age', _age);
                       final score = await Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => QuizCard()),
