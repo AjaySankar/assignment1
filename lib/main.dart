@@ -47,13 +47,32 @@ class PersonalInformationForm extends StatefulWidget {
 }
 
 class PersonalInformationFormState extends State<PersonalInformationForm> {
-  String _firstName = '';
-  String _familyName = '';
-  String _nickName = '';
-  int _age = 1;
+  String _firstName;
+  String _familyName;
+  String _nickName;
+  int _age;
   int _score = -1;
   final _formKey = GlobalKey<FormState>();
   final String _userPreferencesFile = 'UserPreferences.txt';
+  TextEditingController firstNameController;
+  TextEditingController lastNameController;
+  TextEditingController nickNameController;
+  TextEditingController ageController;
+
+  @override
+  void initState() {
+    super.initState();
+    FileHandler().readFile(_userPreferencesFile).then((String value) {
+      if(value.length == 0) {
+        value = ',,,';
+      }
+      final List<String> userInfo = value.split(',');
+      firstNameController = TextEditingController(text: userInfo[0]);
+      lastNameController = TextEditingController(text: userInfo[1]);
+      nickNameController = TextEditingController(text: userInfo[2]);
+      ageController = TextEditingController(text: userInfo[3]);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -83,6 +102,7 @@ class PersonalInformationFormState extends State<PersonalInformationForm> {
             children: <Widget>[
               Expanded(
                   child: TextFormField (
+                    controller: firstNameController,
                     validator: (value) {
                       if (value.isEmpty) {
                         return 'Please enter first name';
@@ -91,7 +111,7 @@ class PersonalInformationFormState extends State<PersonalInformationForm> {
                     },
                     onSaved: (value) {
                       setState(() {
-                        _firstName = value;
+                        _firstName = firstNameController.text;
                       });
                     },
                     decoration: InputDecoration(
@@ -113,6 +133,7 @@ class PersonalInformationFormState extends State<PersonalInformationForm> {
             children: <Widget>[
               Expanded(
                   child: TextFormField (
+                    controller: lastNameController,
                     validator: (value) {
                       if (value.isEmpty) {
                         return 'Please enter last name';
@@ -121,7 +142,7 @@ class PersonalInformationFormState extends State<PersonalInformationForm> {
                     },
                     onSaved: (value) {
                       setState(() {
-                        _familyName = value;
+                        _familyName = lastNameController.text;
                       });
                     },
                     decoration: InputDecoration(
@@ -143,6 +164,7 @@ class PersonalInformationFormState extends State<PersonalInformationForm> {
             children: <Widget>[
               Expanded(
                   child: TextFormField (
+                    controller: nickNameController,
                     validator: (value) {
                       if (value.isEmpty) {
                         return 'Please enter your nickname';
@@ -151,7 +173,7 @@ class PersonalInformationFormState extends State<PersonalInformationForm> {
                     },
                     onSaved: (value) {
                       setState(() {
-                        _nickName = value;
+                        _nickName = nickNameController.text;
                       });
                     },
                     decoration: InputDecoration(
@@ -173,6 +195,7 @@ class PersonalInformationFormState extends State<PersonalInformationForm> {
             children: <Widget>[
               Expanded(
                   child: TextFormField (
+                    controller: ageController,
                     keyboardType: TextInputType.number,
                     validator: (value) {
                       if (value.isEmpty) {
@@ -185,7 +208,7 @@ class PersonalInformationFormState extends State<PersonalInformationForm> {
                     },
                     onSaved: (value) {
                       setState(() {
-                        _age = int.tryParse(value);
+                        _age = int.tryParse(ageController.text);
                       });
                     },
                     decoration: InputDecoration(
@@ -215,7 +238,6 @@ class PersonalInformationFormState extends State<PersonalInformationForm> {
                         Scaffold.of(context)
                             .showSnackBar(SnackBar(content: Text('Updated your details as - ${_firstName},${_familyName},${_nickName},${_age}')));
                       });
-                      print('${_firstName}, ${_familyName}, ${_nickName}, ${_age}');
                       final score = await Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => QuizCard()),
