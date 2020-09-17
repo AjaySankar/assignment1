@@ -63,6 +63,7 @@ class PersonalInformationFormState extends State<PersonalInformationForm> {
   void initState() {
     super.initState();
     FileHandler().readFile(_userPreferencesFile).then((String value) {
+      print("Read User preferences - ${value}");
       if(value.length == 0) {
         value = ',,,';
       }
@@ -73,6 +74,18 @@ class PersonalInformationFormState extends State<PersonalInformationForm> {
       ageController = TextEditingController(text: userInfo[3]);
     });
   }
+
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is removed from the
+    // widget tree.
+    firstNameController.dispose();
+    lastNameController.dispose();
+    nickNameController.dispose();
+    ageController.dispose();
+    super.dispose();
+  }
+
 
   @override
   Widget build(BuildContext context) {
