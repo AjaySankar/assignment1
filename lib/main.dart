@@ -365,62 +365,64 @@ class QuizCardState extends State<QuizCard> {
             // color: Colors.red[600],
             child: Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                      question.getQuestion(),
-                      style: TextStyle(
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                        question.getQuestion(),
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontFamily: 'Open Sans',
+                        ),
+                    ),
+                    ...question.getChoices().map((choice) => ListTile(
+                    title: Text(
+                        choice,
+                        style: TextStyle(
                         fontSize: 20,
                         fontFamily: 'Open Sans',
-                      ),
-                  ),
-                  ...question.getChoices().map((choice) => ListTile(
-                  title: Text(
-                      choice,
-                      style: TextStyle(
-                      fontSize: 20,
-                      fontFamily: 'Open Sans',
-                      ),
-                  ),
-                  leading: Radio(
-                    value: '${choice}',
-                    groupValue: QuizManager().getMyGuess(_questionId),
-                    onChanged: (value) {
-                      setState(() {
-                        QuizManager().updateQuestionGuess(_questionId, value);
-                        _didUserAnswer = QuizManager().getMyGuess(_questionId).length > 0;
-                      });
-                    },
-                  ),)).toList(),
-                  Row (
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      RaisedButton(
-                        onPressed: _questionId >= 1 ? () {
-                          setState(() {
-                            _didUserAnswer = QuizManager().getMyGuess(_questionId-1).length > 0;
-                            _questionId = _questionId - 1;
-                          });
-                        } : null,
-                        child: Text('Prev')
-                      ),
-                      RaisedButton(
-                        onPressed: _questionId == QuizManager().getNumberOfQuestions()-1 ? ( // If this is the last question
-                            _didUserAnswer ? () {  // If User has answered the last question, then on click show his score.
-                              Navigator.pop(context, QuizManager().getScore());
-                            } : null // If user has not answered the last question yet then disable 'Next' button.
-                        ) : () { // If this is not the last question, then go to the next question.
-                          setState(() {
-                            _didUserAnswer = QuizManager().getMyGuess(_questionId+1).length > 0;
-                            _questionId = _questionId + 1;
-                          });
-                        },
-                        child: Text(_questionId == QuizManager().getNumberOfQuestions()-1 && _didUserAnswer ? 'End' : 'Next')
-                      )
-                    ],
-                  )
-                ],
+                        ),
+                    ),
+                    leading: Radio(
+                      value: '${choice}',
+                      groupValue: QuizManager().getMyGuess(_questionId),
+                      onChanged: (value) {
+                        setState(() {
+                          QuizManager().updateQuestionGuess(_questionId, value);
+                          _didUserAnswer = QuizManager().getMyGuess(_questionId).length > 0;
+                        });
+                      },
+                    ),)).toList(),
+                    Row (
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        RaisedButton(
+                          onPressed: _questionId >= 1 ? () {
+                            setState(() {
+                              _didUserAnswer = QuizManager().getMyGuess(_questionId-1).length > 0;
+                              _questionId = _questionId - 1;
+                            });
+                          } : null,
+                          child: Text('Prev')
+                        ),
+                        RaisedButton(
+                          onPressed: _questionId == QuizManager().getNumberOfQuestions()-1 ? ( // If this is the last question
+                              _didUserAnswer ? () {  // If User has answered the last question, then on click show his score.
+                                Navigator.pop(context, QuizManager().getScore());
+                              } : null // If user has not answered the last question yet then disable 'Next' button.
+                          ) : () { // If this is not the last question, then go to the next question.
+                            setState(() {
+                              _didUserAnswer = QuizManager().getMyGuess(_questionId+1).length > 0;
+                              _questionId = _questionId + 1;
+                            });
+                          },
+                          child: Text(_questionId == QuizManager().getNumberOfQuestions()-1 && _didUserAnswer ? 'End' : 'Next')
+                        )
+                      ],
+                    )
+                  ],
+                ),
               ),
             ),
           ),
