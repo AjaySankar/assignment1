@@ -54,6 +54,7 @@ class PersonalInformationFormState extends State<PersonalInformationForm> {
   String _age;
   int _score = -1;
   final _formKey = GlobalKey<FormState>();
+  final String _scoreFile = 'score.txt';
   TextEditingController firstNameController;
   TextEditingController lastNameController;
   TextEditingController nickNameController;
@@ -255,6 +256,7 @@ class PersonalInformationFormState extends State<PersonalInformationForm> {
                         context,
                         MaterialPageRoute(builder: (context) => QuizCard()),
                       );
+                      FileHandler().writeFile(_scoreFile, '$score');
                       setState(() {
                         _score = score;
                       });
