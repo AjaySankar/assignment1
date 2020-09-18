@@ -1,46 +1,48 @@
-[
-  {
-    "id": 0,
-    "question": "Far-right protestors tried to storm the Parliament building in which country?",
-    "choices": [
-      "Australia",
-      "Britain",
-      "France",
-      "Germany"
-    ],
-    "answer": "Germany"
-  },
-  {
-    "id": 1,
-    "question": "Why did Shinzo Abe, prime minister of Japan, resign from office?",
-    "choices": [
-      "An extramarital affair",
-      "Fraud",
-      "Illness",
-      "Protests"
-    ],
-    "answer": "Illness"
-  },
-  {
-    "id": 2,
-    "question": "What did two commercial jet pilots reported seeing in the busy airspace near Los Angeles International Airport?",
-    "choices": [
-      "An attack drone",
-      "A man with a jetpack",
-      "A girl attached to a kite",
-      "A U.F.O"
-    ],
-    "answer": "A man with a jetpack"
-  },
-  {
-    "id": 3,
-    "question": "After more than seven decades of absence, jaguars are being reintroduced into the wetlands of which country?",
-    "choices": [
-      "Argentina",
-      "Belize",
-      "Colombia",
-      "Mexico"
-    ],
-    "answer": "Argentina"
-  }
-]
+{
+  "payload": [
+    {
+      "id": 0,
+      "question": "Far-right protestors tried to storm the Parliament building in which country?",
+      "choices": [
+        "Australia",
+        "Britain",
+        "France",
+        "Germany"
+      ],
+      "answer": "Germany"
+    },
+    {
+      "id": 1,
+      "question": "Why did Shinzo Abe, prime minister of Japan, resign from office?",
+      "choices": [
+        "An extramarital affair",
+        "Fraud",
+        "Illness",
+        "Protests"
+      ],
+      "answer": "Illness"
+    },
+    {
+      "id": 2,
+      "question": "What did two commercial jet pilots reported seeing in the busy airspace near Los Angeles International Airport?",
+      "choices": [
+        "An attack drone",
+        "A man with a jetpack",
+        "A girl attached to a kite",
+        "A U.F.O"
+      ],
+      "answer": "A man with a jetpack"
+    },
+    {
+      "id": 3,
+      "question": "After more than seven decades of absence, jaguars are being reintroduced into the wetlands of which country?",
+      "choices": [
+        "Argentina",
+        "Belize",
+        "Colombia",
+        "Mexico"
+      ],
+      "answer": "Argentina"
+    }
+  ]
+}
