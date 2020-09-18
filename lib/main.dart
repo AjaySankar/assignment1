@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
+import 'dart:convert';
+import 'package:flutter/services.dart' show rootBundle;
 
 void main() {
   runApp(MyApp());
@@ -269,7 +271,7 @@ class PersonalInformationFormState extends State<PersonalInformationForm> {
                       _formKey.currentState.save();
                       final score = await Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => QuizCard()),
+                        MaterialPageRoute(builder: (context) => QuestionScreen()),
                       );
                       setState(() {
                         _score = score;
@@ -298,6 +300,68 @@ class PersonalInformationFormState extends State<PersonalInformationForm> {
   }
 }
 
+Future<String>_loadFromAsset() async {
+  return await rootBundle.loadString("assets/quiz.json");
+}
+
+Future parseJson() async {
+  String jsonString = await _loadFromAsset();
+  return json.decode(jsonString);
+}
+
+class QuestionScreen extends StatelessWidget {
+  Future<dynamic> _getQuestions = parseJson();
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Quiz App"),
+      ),
+      body: Center(
+        child: Container(
+          margin: const EdgeInsets.all(10.0),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: SingleChildScrollView(
+              child: FutureBuilder<dynamic>(
+                future: _getQuestions,
+                builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                  List<Widget> children;
+                  if (snapshot.hasData) {
+                    // print(snapshot.data);
+                    QuizManager().loadQuestions((snapshot.data));
+                    children = <Widget>[
+                      QuizCard()
+                    ];
+                  } else {
+                    children = <Widget>[
+                      SizedBox(
+                        child: CircularProgressIndicator(),
+                        width: 60,
+                        height: 60,
+                      ),
+                      const Padding(
+                        padding: EdgeInsets.only(top: 16),
+                        child: Text('Loading quiz...'),
+                      )
+                    ];
+                  }
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: children,
+                    ),
+                  );
+                },
+              ),
+            )
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class QuizCard extends StatefulWidget {
   QuizCard({Key key}) : super(key: key);
   @override
@@ -313,6 +377,11 @@ class Question {
   String _correctAnswer = '';
   String _myGuess = '';
   Question(this._questionId, this._question, this._choices, this._correctAnswer);
+  Question.fromJson(Map<String, dynamic> json)
+      : _questionId = json['id'],
+        _question = json['question'],
+        _choices = json['choices'],
+        _correctAnswer = json['answer'];
   int getQuestionId() {
     return _questionId;
   }
@@ -335,17 +404,24 @@ class Question {
 
 class QuizManager {
   static final QuizManager _quizManager = QuizManager._internal();
-  final List<Question> questions = [
-    Question(0, 'Far-right protestors tried to storm the Parliament building in which country?', ['Australia','Britain','France','Germany'], 'Germany'),
-    Question(1, 'Why did Shinzo Abe, prime minister of Japan, resign from office?', ['An extramarital affair','Fraud','Illness','Protests'], 'Illness'),
-    Question(2, 'What did two commercial jet pilots reported seeing in the busy airspace near Los Angeles International Airport?', ['An attack drone','A man with a jetpack','A girl attached to a kite','A U.F.O'], 'A man with a jetpack'),
-    Question(3, 'After more than seven decades of absence, jaguars are being reintroduced into the wetlands of which country?', ['Argentina','Belize','Colombia','Mexico'], 'Argentina'),
-  ];
+  List<Question> questions = [];
   factory QuizManager() {
     return _quizManager;
   }
   QuizManager._internal() {
     // Read the file to fill in questions
+  }
+  void loadQuestions(Map<String, dynamic> questions) {
+    questions['payload'].forEach((question) =>
+        this.questions.add(
+            Question(
+                question['id'],
+                question['question'],
+                question['choices'].cast<String>().toList(),
+                question['answer']
+            )
+        )
+    );
   }
   int getNumberOfQuestions() {
     return this.questions.length;
@@ -372,73 +448,57 @@ class QuizCardState extends State<QuizCard> {
   bool _didUserAnswer = false;
   Widget build(BuildContext context) {
     Question question = QuizManager().getQuestion(_questionId);
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Quiz App"),
-      ),
-      body: Center(
-          child: Container(
-            margin: const EdgeInsets.all(10.0),
-            // color: Colors.red[600],
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                        question.getQuestion(),
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontFamily: 'Open Sans',
-                        ),
-                    ),
-                    ...question.getChoices().map((choice) => ListTile(
-                    title: Text(
-                        choice,
-                        style: TextStyle(
-                        fontSize: 20,
-                        fontFamily: 'Open Sans',
-                        ),
-                    ),
-                    leading: Radio(
-                      value: '${choice}',
-                      groupValue: QuizManager().getMyGuess(_questionId),
-                      onChanged: (value) {
-                        setState(() {
-                          QuizManager().updateQuestionGuess(_questionId, value);
-                          _didUserAnswer = QuizManager().getMyGuess(_questionId).length > 0;
-                        });
-                      },
-                    ),)).toList(),
-                    Row (
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Opacity(
-                          opacity: _didUserAnswer ? 1.0 : 0.0,
-                          child: RaisedButton(
-                            onPressed: _questionId == QuizManager().getNumberOfQuestions()-1 ? ( // If this is the last question
-                                _didUserAnswer ? () {  // If User has answered the last question, then on click show his score.
-                                  Navigator.pop(context, QuizManager().getScore());
-                                } : null // If user has not answered the last question yet then disable 'Next' button.
-                            ) : () { // If this is not the last question, then go to the next question.
-                              setState(() {
-                                _didUserAnswer = QuizManager().getMyGuess(_questionId+1).length > 0;
-                                _questionId = _questionId + 1;
-                              });
-                            },
-                            child: Text(_questionId == QuizManager().getNumberOfQuestions()-1 && _didUserAnswer ? 'End' : 'Next')
-                          ),
-                        )
-                      ],
-                    )
-                  ],
-                ),
-              ),
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+            question.getQuestion(),
+            style: TextStyle(
+              fontSize: 20,
+              fontFamily: 'Open Sans',
             ),
-          ),
         ),
-    );
+        ...question.getChoices().map((choice) => ListTile(
+        title: Text(
+            choice,
+            style: TextStyle(
+            fontSize: 20,
+            fontFamily: 'Open Sans',
+            ),
+        ),
+        leading: Radio(
+          value: '${choice}',
+          groupValue: QuizManager().getMyGuess(_questionId),
+          onChanged: (value) {
+            setState(() {
+              QuizManager().updateQuestionGuess(_questionId, value);
+              _didUserAnswer = QuizManager().getMyGuess(_questionId).length > 0;
+            });
+          },
+        ),)).toList(),
+        Row (
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Opacity(
+              opacity: _didUserAnswer ? 1.0 : 0.0,
+              child: RaisedButton(
+                onPressed: _questionId == QuizManager().getNumberOfQuestions()-1 ? ( // If this is the last question
+                    _didUserAnswer ? () {  // If User has answered the last question, then on click show his score.
+                      Navigator.pop(context, QuizManager().getScore());
+                    } : null // If user has not answered the last question yet then disable 'Next' button.
+                ) : () { // If this is not the last question, then go to the next question.
+                  setState(() {
+                    _didUserAnswer = QuizManager().getMyGuess(_questionId+1).length > 0;
+                    _questionId = _questionId + 1;
+                  });
+                },
+                child: Text(_questionId == QuizManager().getNumberOfQuestions()-1 && _didUserAnswer ? 'End' : 'Next')
+              ),
+            )
+          ],
+        )
+      ],
+    ); // here
   }
 }
 
