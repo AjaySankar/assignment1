@@ -273,7 +273,7 @@ class PersonalInformationFormState extends State<PersonalInformationForm> {
                       final score = await Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => QuestionScreen()),
-                      );
+                      ) ?? -1;
                       setState(() {
                         _score = score;
                       });
