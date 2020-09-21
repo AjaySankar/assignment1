@@ -62,6 +62,7 @@ class PersonalInformationFormState extends State<PersonalInformationForm> {
   TextEditingController nickNameController;
   TextEditingController ageController;
 
+  // Read user pref and autofill the form.
   Future<Null> getSharedPrefs() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -242,7 +243,7 @@ class PersonalInformationFormState extends State<PersonalInformationForm> {
           Container(
             height: 15,
           ),
-          _score >= 0 ?
+          _score >= 0 ? // Once the quiz has ended and returned the score, store user pref and score.
           Container(
             child: RaisedButton(
               onPressed: () async {
@@ -276,13 +277,13 @@ class PersonalInformationFormState extends State<PersonalInformationForm> {
                       setState(() {
                         _score = score;
                       });
-                      print('Your score - ${score}');
+                      // print('Your score - ${score}');
                     }
                   },
                   child: Text('Start Quiz')
               )
           ),
-          _score >= 0 ?
+          _score >= 0 ? // Conditionally render user score text.
           Container(
             margin: const EdgeInsets.all(10.0),
             child: Text(
@@ -310,6 +311,12 @@ Future parseJson() async {
   String jsonString = await _loadFromAsset();
   return json.decode(jsonString);
 }
+
+/*
+  * Reads questions from the assets and passes them to the quiz manager.
+  * Shows a loading spinner while reading questions.
+  * Displays the first question once it is done with reading questions.
+*/
 
 class QuestionScreen extends StatelessWidget {
   Future<dynamic> _getQuestions = parseJson();
@@ -417,7 +424,7 @@ class Question {
 
 
 /* Singleton class for QuizManager as there can be only one manager for a Quiz
-  * Read the questions from the assets and create quiz cards.
+  * Create quiz cards.
   * Serves the next/prev question card.
   * Update the user guess for a given question.
   * Verifies if a question's guess is correct.
