@@ -441,6 +441,7 @@ class QuizManager {
     // Singleton constructor
   }
   void loadQuestions(Map<String, dynamic> questions) {
+    this.questions = []; // Clear existing questions to refresh the quiz.
     questions['payload'].forEach((question) =>
         this.questions.add(
             Question(
