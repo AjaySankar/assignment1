@@ -300,10 +300,12 @@ class PersonalInformationFormState extends State<PersonalInformationForm> {
   }
 }
 
+// Reads questions from assets
 Future<String>_loadFromAsset() async {
   return await rootBundle.loadString("assets/quiz.json");
 }
 
+// Returns the parsed JSON
 Future parseJson() async {
   String jsonString = await _loadFromAsset();
   return json.decode(jsonString);
@@ -370,46 +372,66 @@ class QuizCard extends StatefulWidget {
   }
 }
 
+/*
+  * Question class to hold current state of a question displayed in the quiz card
+ */
 class Question {
   int _questionId = 0;
   String _question = '';
   List<String> _choices = [];
   String _correctAnswer = '';
   String _myGuess = '';
+
   Question(this._questionId, this._question, this._choices, this._correctAnswer);
+
   Question.fromJson(Map<String, dynamic> json)
       : _questionId = json['id'],
         _question = json['question'],
         _choices = json['choices'],
         _correctAnswer = json['answer'];
+
   int getQuestionId() {
     return _questionId;
   }
+
   String getQuestion() {
     return _question;
   }
+
   List<String> getChoices() {
     return _choices;
   }
+
   bool isMyGuessCorrect() {
     return this._myGuess == this._correctAnswer;
   }
+
   void setMyGuess(String guess) {
     this._myGuess = guess;
   }
+
   String getMyGuess() {
     return _myGuess;
   }
 }
 
+
+/* Singleton class for QuizManager as there can be only one manager for a Quiz
+  * Read the questions from the assets and create quiz cards.
+  * Serves the next/prev question card.
+  * Update the user guess for a given question.
+  * Verifies if a question's guess is correct.
+  * Calculates the final quiz score.
+*/
+
 class QuizManager {
   static final QuizManager _quizManager = QuizManager._internal();
-  List<Question> questions = [];
+  List<Question> questions = []; // List of question cards
   factory QuizManager() {
     return _quizManager;
   }
   QuizManager._internal() {
-    // Read the file to fill in questions
+    // Singleton constructor
   }
   void loadQuestions(Map<String, dynamic> questions) {
     questions['payload'].forEach((question) =>
@@ -480,7 +502,7 @@ class QuizCardState extends State<QuizCard> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Opacity(
-              opacity: _didUserAnswer ? 1.0 : 0.0,
+              opacity: _didUserAnswer ? 1.0 : 0.0, // Show 'Next' button when user has answered the question.
               child: RaisedButton(
                 onPressed: _questionId == QuizManager().getNumberOfQuestions()-1 ? ( // If this is the last question
                     _didUserAnswer ? () {  // If User has answered the last question, then on click show his score.
@@ -492,16 +514,21 @@ class QuizCardState extends State<QuizCard> {
                     _questionId = _questionId + 1;
                   });
                 },
-                child: Text(_questionId == QuizManager().getNumberOfQuestions()-1 && _didUserAnswer ? 'End' : 'Next')
+                child: Text(
+                    _questionId == QuizManager().getNumberOfQuestions()-1
+                        && _didUserAnswer // If the last question is answered, then change button from 'Next' to 'End'
+                        ? 'End' : 'Next'
+                )
               ),
             )
           ],
         )
       ],
-    ); // here
+    );
   }
 }
 
+// File handling utilities to read or write to a file
 class FileHandler {
   Future<String> localPath() async {
     final directory = await getApplicationDocumentsDirectory();
