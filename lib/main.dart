@@ -338,9 +338,25 @@ class QuestionScreen extends StatelessWidget {
                   if (snapshot.hasData) {
                     // print(snapshot.data);
                     QuizManager().loadQuestions((snapshot.data));
-                    children = <Widget>[
-                      QuizCard()
-                    ];
+                    if(QuizManager().getNumberOfQuestions() > 0) {
+                      children = <Widget>[
+                        QuizCard()
+                      ];
+                    }
+                    else {
+                      children = <Widget>[
+                        Center(
+                          child: Text(
+                            "Oops!.. No questions",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontFamily: 'Open Sans',
+                            ),
+                          ),
+                        )
+                      ];
+                    }
                   } else {
                     children = <Widget>[
                       SizedBox(
@@ -422,7 +438,6 @@ class Question {
   }
 }
 
-
 /* Singleton class for QuizManager as there can be only one manager for a Quiz
   * Create quiz cards.
   * Serves the next/prev question card.
@@ -440,8 +455,11 @@ class QuizManager {
   QuizManager._internal() {
     // Singleton constructor
   }
-  void loadQuestions(Map<String, dynamic> questions) {
+  void loadQuestions(final Map<String, dynamic> questions) {
     this.questions = []; // Clear existing questions to refresh the quiz.
+    if(!questions.containsKey('payload') || !(questions['payload'] is List) || questions['payload'].length == 0){
+      return;
+    }
     questions['payload'].forEach((question) =>
         this.questions.add(
             Question(
@@ -473,9 +491,12 @@ class QuizManager {
   }
 }
 
+/*
+  * State of the quiz card.
+*/
 class QuizCardState extends State<QuizCard> {
-  int _questionId = 0;
-  bool _didUserAnswer = false;
+  int _questionId = 0; // ID question displayed to the user
+  bool _didUserAnswer = false; // Is the question answered or not
   Widget build(BuildContext context) {
     Question question = QuizManager().getQuestion(_questionId);
     return Column(
