@@ -445,10 +445,10 @@ class QuizManager {
     questions['payload'].forEach((question) =>
         this.questions.add(
             Question(
-                question['id'],
-                question['question'],
-                question['choices'].cast<String>().toList(),
-                question['answer']
+                question['id'] ?? -1,
+                question['question'] ?? '',
+                question['choices'].cast<String>().toList() ?? [],
+                question['answer'] ?? ''
             )
         )
     );
@@ -488,24 +488,23 @@ class QuizCardState extends State<QuizCard> {
               fontFamily: 'Open Sans',
             ),
         ),
-        ...question.getChoices().map((choice) => ListTile(
-        title: Text(
+        ...question.getChoices().map((choice) => RadioListTile<String>(
+          title: Text(
             choice,
             style: TextStyle(
-            fontSize: 20,
-            fontFamily: 'Open Sans',
+              fontSize: 20,
+              fontFamily: 'Open Sans',
             ),
-        ),
-        leading: Radio(
+          ),
           value: '${choice}',
           groupValue: QuizManager().getMyGuess(_questionId),
-          onChanged: (value) {
+          onChanged: (String value) {
             setState(() {
               QuizManager().updateQuestionGuess(_questionId, value);
               _didUserAnswer = QuizManager().getMyGuess(_questionId).length > 0;
             });
           },
-        ),)).toList(),
+        )).toList(),
         Row (
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
