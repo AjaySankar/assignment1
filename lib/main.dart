@@ -357,7 +357,21 @@ class QuestionScreen extends StatelessWidget {
                         )
                       ];
                     }
-                  } else {
+                  }
+                  else if (snapshot.hasError) {
+                    children = <Widget>[
+                      Icon(
+                        Icons.error_outline,
+                        color: Colors.red,
+                        size: 60,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 16),
+                        child: Text('Error: ${snapshot.error}'),
+                      )
+                    ];
+                  }
+                  else {
                     children = <Widget>[
                       SizedBox(
                         child: CircularProgressIndicator(),
